@@ -31,9 +31,10 @@ class TypeTime(Enum):
 
 
 class Parse:
-    def __init__(self, filepath, livesplit_enum):
+    def __init__(self, filepath, time, livesplit_enum):
         self.filepath = filepath
         self.enum = livesplit_enum
+        self.time = time
 
     # Get a game name and a category
     def getMainInfo(self):
@@ -42,8 +43,7 @@ class Parse:
 
     # Get root of xml
     def getRoot(self):
-        self.handle = ET.parse(self.filepath)
-        return self.handle.getroot()
+        return ET.parse(self.filepath).getroot()
 
     # Get array with splits and array size
     def getSplits(self):
@@ -77,20 +77,17 @@ class Parse:
 
     @staticmethod
     def init():
-
         if p:
             print(p.getMainInfo())
             try:
                 Splits, SplitArraySize = p.getSplits()
-                for i in range(SplitArraySize):
-                    SplitName = Splits[i][SplitEnum.Name.value].text
-                    BestIGTime = Splits[i][SplitEnum.BestSegmentTime.value][TypeTime.GameTime.value].text
-                    PossibleSavePerSplit = p.time_sub(p.text2time(p.getSegmentsHistory()[i]),
+                for split_id in range(SplitArraySize):
+                    SplitName = Splits[split_id][SplitEnum.Name.value].text
+                    BestIGTime = Splits[split_id][SplitEnum.BestSegmentTime.value][TypeTime.GameTime.value].text
+                    PossibleSavePerSplit = p.time_sub(p.text2time(p.getSegmentsHistory()[split_id]),
                                                       p.text2time(BestIGTime))
-
-                    if PossibleSavePerSplit.seconds >= 1:
-                        print(
-                                f'Name: {SplitName:>32}\tIGT: {p.text2time(p.getSegmentsHistory()[i]).time()} Best Segment: {p.text2time(BestIGTime).time()} | +{PossibleSavePerSplit}')
+                    if PossibleSavePerSplit.seconds >= p.time:
+                        print(f'Segment: {SplitName:>32}\tIGT: {str(p.text2time(p.getSegmentsHistory()[split_id]).time())[:-7]} Best Segment: {str(p.text2time(BestIGTime).time())[:-7]} | +{str(PossibleSavePerSplit)[:-7]}')
             except TypeError:
                 pass
 
@@ -98,12 +95,15 @@ class Parse:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", "-p", help="path to split file (*.lss)")
+    parser.add_argument("--path", "-p", help="Path to split file (*.lss)")
+    parser.add_argument("--time", "-t",
+                        help="Number of seconds possible to save for each split. This option displays the splits, where you can save more time or equal to the specified one.",
+                        type=int)
     args = parser.parse_args()
 
-    if args.path:
-        p = Parse(args.path, XMLEnum)
+    if args.path and args.time:
+        p = Parse(args.path, args.time, XMLEnum)
         if p:
             p.init()
-    else:
-        print("Usage: SplitsExtractor.py -h (--help)")
+else:
+    print("Usage: SplitsExtractor.py -h (--help)")
