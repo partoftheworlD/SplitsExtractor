@@ -78,6 +78,8 @@ class Parse:
     @staticmethod
     def init():
         if p:
+            if p.time >= 60:
+                p.time = 59
             print(p.getMainInfo())
             try:
                 Splits, SplitArraySize = p.getSplits()
