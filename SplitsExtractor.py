@@ -78,8 +78,6 @@ class Parse:
     @staticmethod
     def init():
         if p:
-            if p.time >= 60:
-                p.time = 59
             print(p.getMainInfo())
             try:
                 Splits, SplitArraySize = p.getSplits()
@@ -88,7 +86,7 @@ class Parse:
                     BestIGTime = Splits[split_id][SplitEnum.BestSegmentTime.value][TypeTime.GameTime.value].text
                     PossibleSavePerSplit = p.time_sub(p.text2time(p.getSegmentsHistory()[split_id]),
                                                       p.text2time(BestIGTime))
-                    if PossibleSavePerSplit.seconds >= p.time:
+                    if PossibleSavePerSplit.total_seconds() >= p.time:
                         print(f'Segment: {SplitName:>32}\tIGT: {str(p.text2time(p.getSegmentsHistory()[split_id]).time())[:-7]} Best Segment: {str(p.text2time(BestIGTime).time())[:-7]} | +{str(PossibleSavePerSplit)[:-7]}')
             except TypeError:
                 pass
