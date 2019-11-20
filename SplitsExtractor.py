@@ -105,5 +105,5 @@ if __name__ == '__main__':
         p = Parse(args.path, args.time, XMLEnum)
         if p:
             p.init()
-else:
-    print("Usage: SplitsExtractor.py -h (--help)")
+    else:
+        print("Usage: SplitsExtractor.py -h (--help)")
