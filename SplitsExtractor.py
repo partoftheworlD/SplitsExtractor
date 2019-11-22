@@ -38,8 +38,8 @@ class Parse:
 
     # Get a game name and a category
     def getMainInfo(self):
-        return '{} - {}'.format(self.getRoot()[XMLEnum.GameName.value].text,
-                                self.getRoot()[XMLEnum.CategoryName.value].text)
+        return '{} - {}'.format(self.getRoot().find("GameName").text,
+                                self.getRoot().find("CategoryName").text)
 
     # Get root of xml
     def getRoot(self):
@@ -47,7 +47,7 @@ class Parse:
 
     # Get array with splits and array size
     def getSplits(self):
-        Splits = self.getRoot()[XMLEnum.Segments.value]
+        Splits = self.getRoot().find("Segments")
         SplitsNum = len(Splits)
         return Splits, SplitsNum
 
@@ -55,12 +55,12 @@ class Parse:
     def getSegmentsHistory(self):
 
         HistoryBuffer = []
-        History = self.getRoot()[XMLEnum.Segments.value]
+        History, _ = self.getSplits()
         HistoryLen = len(History)
 
         for i in range(HistoryLen):
-            TimerLen = len(History[i][SplitEnum.SegmentHistory.value])
-            HistoryBuffer.append(History[i][SplitEnum.SegmentHistory.value][TimerLen - 1][TypeTime.GameTime.value].text)
+            #FIXME: the problem with the last element, why can't it be -1 ???
+            HistoryBuffer.append(History[i].find("SegmentHistory")[-2][TypeTime.GameTime.value].text)
         return HistoryBuffer
 
     # Convert text to time
@@ -82,8 +82,8 @@ class Parse:
             try:
                 Splits, SplitArraySize = p.getSplits()
                 for split_id in range(SplitArraySize):
-                    SplitName = Splits[split_id][SplitEnum.Name.value].text
-                    BestIGTime = Splits[split_id][SplitEnum.BestSegmentTime.value][TypeTime.GameTime.value].text
+                    SplitName = Splits[split_id].find("Name").text
+                    BestIGTime = Splits[split_id].find("BestSegmentTime")[TypeTime.GameTime.value].text
                     PossibleSavePerSplit = p.time_sub(p.text2time(p.getSegmentsHistory()[split_id]),
                                                       p.text2time(BestIGTime))
                     if PossibleSavePerSplit.total_seconds() >= p.time:
