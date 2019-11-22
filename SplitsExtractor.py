@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 import argparse
-import datetime as dt
+from datetime import datetime as dt
 import xml.etree.ElementTree as ET
 from enum import Enum
-
 
 class XMLEnum(Enum):
     GameIcon = 0
@@ -28,7 +27,6 @@ class SplitEnum(Enum):
 class TypeTime(Enum):
     RealTime = 0
     GameTime = 1
-
 
 class Parse:
     def __init__(self, filepath, time, livesplit_enum):
@@ -65,7 +63,8 @@ class Parse:
 
     # Convert text to time
     def text2time(self, text):
-        return dt.datetime.strptime(text[:-4], "%H:%M:%S.%f")
+        #TODO: Add manual time format support
+        return dt.strptime(text[:-4], "%H:%M:%S.%f")
 
     @staticmethod
     def time_sub(time1, time2):
@@ -84,11 +83,12 @@ class Parse:
                 for split_id in range(SplitArraySize):
                     SplitName = Splits[split_id].find("Name").text
                     BestIGTime = Splits[split_id].find("BestSegmentTime")[TypeTime.GameTime.value].text
+
                     PossibleSavePerSplit = p.time_sub(p.text2time(p.getSegmentsHistory()[split_id]),
                                                       p.text2time(BestIGTime))
                     if PossibleSavePerSplit.total_seconds() >= p.time:
                         print(f'Segment: {SplitName:>32}\tIGT: {str(p.text2time(p.getSegmentsHistory()[split_id]).time())[:-7]} Best Segment: {str(p.text2time(BestIGTime).time())[:-7]} | +{str(PossibleSavePerSplit)[:-7]}')
-            except TypeError:
+            except (TypeError, ValueError):
                 pass
 
 
