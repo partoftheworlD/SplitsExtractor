@@ -1,5 +1,5 @@
 # SplitsExtractor
-The script was created because I'm too lazy to check for problems in the splits after the race
+The script was created because I'm too lazy to check for problems in the splits after runs
 
 # Requires
 > Python 3.6+
